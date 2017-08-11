@@ -1,0 +1,1 @@
+var myApp = angular.module('stockApp', ['stockController','stockService','angularUtils.directives.dirPagination']);

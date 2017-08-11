@@ -1,0 +1,1 @@
+var myApp = angular.module('areaApp', ['areaController','areaService','angularUtils.directives.dirPagination']);
