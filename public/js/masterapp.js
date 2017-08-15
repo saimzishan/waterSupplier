@@ -1,1 +1,0 @@
-var myApp = angular.module('masterDataApp', ['masterController','masterService','angularUtils.directives.dirPagination','ngFileUpload']);
