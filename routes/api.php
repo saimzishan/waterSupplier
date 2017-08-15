@@ -27,8 +27,6 @@ Route::get('dashboard/sales', 'SalesController@index')->middleware('api');
 Route::get('dashboard/getsalesMen', 'SalesController@getSalesMen')->middleware('api');
 Route::get('dashboard/getstock', 'SalesController@getStock')->middleware('api');
 Route::get('dashboard/getStockbyId/{id}', 'SalesController@getStockbyID')->middleware('api');
-Route::get('dashboard/check_validiti/{id}', 'SalesController@check_validiti')->middleware('api');
-
 
 Route::get('dashboard/salemenList', 'SalemenController@index')->middleware('api');
 Route::get('dashboard/getArea', 'SalemenController@getArea')->middleware('api');

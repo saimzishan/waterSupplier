@@ -58,6 +58,7 @@
                             <td style="width: 15%;">
                                 <button type="button" class="btn btn-small btn-xs btn-warning" ng-click="editAction(record)">Edit</button> |
                                 <button type="button" class="btn btn-small btn-xs btn-danger" ng-click="deleteModal(record.id)">Delete</button>
+                                <button type="button" class="btn btn-small btn-xs btn-success"><a href="{{URL::to('dashboard/sales')}}/@{{ record.id }}">View Sales</a></button>
                             </td>
                         </tr>
                         </tbody>

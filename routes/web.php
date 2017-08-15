@@ -45,6 +45,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => 'auth'], function (){
     Route::get('/sales', 'SalesController@index')->name('sales');
     Route::post('/create/sales/save', 'SalesController@store');
     Route::get('/sales/delete/{id}', 'SalesController@destroy');
+    Route::get('/sales/{id}', 'SalesController@getSalesByID');
 });
 
 Route::get('/', 'HomeController@index');

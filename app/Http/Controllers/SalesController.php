@@ -22,12 +22,12 @@ class SalesController extends Controller
      */
     public function index(Request $request)
     {
-      //  $stock = StockIssue::all();
         if($request->is('api/*')){
             $stackData = DB::table('sales')
                 ->select(['sales.*','salesmen.first_name', 'stock.product_name'])
                 ->join('salesmen', 'sales.salesmen_id', '=', 'salesmen.id')
-                ->join('stock', 'sales.stock_id', '=', 'stock.id')->get();
+                ->join('stock', 'sales.stock_id', '=', 'stock.id')
+                ->where('sales.deleted_at', null)->get();
             return response()->json($stackData);
         }
         return view('admin.sales.index');
@@ -46,6 +46,19 @@ class SalesController extends Controller
             return response()->json($stock);
         }
     }
+    public function getSalesByID($id)
+    {
+
+        // return ('worge');
+        $sales = DB::table('sales')
+            ->select(['sales.*','salesmen.first_name', 'stock.product_name'])
+            ->join('salesmen', 'sales.salesmen_id', '=', 'salesmen.id')
+            ->join('stock', 'sales.stock_id', '=', 'stock.id')
+            ->where('sales.deleted_at', null)
+            ->where('salesmen_id', $id)->get();
+        return view('admin.sales.sale', compact('sales'));
+
+    }
     public function getStockbyID(Request $request, $id)
     {
         $stackData = DB::table('stockissue')
@@ -54,13 +67,6 @@ class SalesController extends Controller
             ->join('stock', 'stockissue.stock_id', '=', 'stock.id')->first();
         if($request->is('api/*')){
             return response()->json($stackData);
-        }
-    }
-    public function check_validiti(Request $request, $id)
-    {
-        $stockByID = StockIssue::where('salesmen_id', $id)->select('quantity' , 'stock_id')->first();
-        if($request->is('api/*')){
-            return response()->json($stockByID);
         }
     }
     /**
