@@ -24,6 +24,11 @@ angular.module('salesController', [])
 			$scope.salesMen = data;
 			$scope.isDisabled = false;
 		});
+		Sales.getUsers()
+		.success(function(data){
+			$scope.users = data;
+			$scope.isDisabled = false;
+		});
 	};
 	loadData();
 	$scope.sort = function(keyname){

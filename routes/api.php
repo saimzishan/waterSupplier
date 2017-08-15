@@ -25,6 +25,7 @@ Route::get('dashboard/getStockbyID/{id}', 'StockIssueController@getStockbyID')->
 
 Route::get('dashboard/sales', 'SalesController@index')->middleware('api');
 Route::get('dashboard/getsalesMen', 'SalesController@getSalesMen')->middleware('api');
+Route::get('dashboard/getUsers', 'SalesController@getUsers')->middleware('api');
 Route::get('dashboard/getstock', 'SalesController@getStock')->middleware('api');
 Route::get('dashboard/getStockbyId/{id}', 'SalesController@getStockbyID')->middleware('api');
 

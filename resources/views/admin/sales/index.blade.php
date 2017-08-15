@@ -40,6 +40,7 @@
                                 <span class="glyphicon sort-icon" ng-show="sortKey=='product_name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span>
                             </th>
                             <th>Solid by</th>
+                            <th>Solid To</th>
                             <th>From Stock</th>
                             <th>Created at</th>
                             <th>Action</th>
@@ -48,7 +49,8 @@
                         <tbody>
                         <tr dir-paginate="record in Users|orderBy:sortKey:reverse|filter:search|itemsPerPage:10">
                             <td>@{{ record.quantity }}</td>
-                            <td>@{{ record.first_name }}</td>
+                            <td>@{{ record.saleMen }}</td>
+                            <td>@{{ record.first_name }} @{{ record.last_name }}</td>
                             <td>@{{ record.product_name }}</td>
                             <td>@{{ record.created_at }}</td>
                             <td style="width: 15%;">
@@ -96,6 +98,15 @@
                                             <select class="form-control" name="salesmen_id" ng-model="newData.salesmen_id"
                                                     ng-options="row.id as row.first_name for row in salesMen" ng-change="get_StockByID(newData.salesmen_id)" required>
                                                 <option value="" selected disabled>-- Select Sales Men --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Solid to User:</label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" name="user_id" ng-model="newData.user_id"
+                                                    ng-options="row.id as row.last_name for row in users" required>
+                                                <option value="" selected disabled>-- Select User --</option>
                                             </select>
                                         </div>
                                     </div>

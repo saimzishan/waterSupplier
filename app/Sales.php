@@ -11,6 +11,6 @@ class Sales extends Model
     protected $table = 'sales';
 
     protected $fillable = [
-        'quantity', 'salesmen_id', 'stock_id', 'created_at', 'updated_at', 'deleted_at'
+        'quantity', 'salesmen_id', 'user_id', 'stock_id', 'created_at', 'updated_at', 'deleted_at'
     ];
 }

@@ -8,6 +8,9 @@ angular.module('salesService', [])
         getSalesMen: function(){
 			return $http.get('/api/dashboard/getsalesMen');
 		},
+        getUsers: function(){
+			return $http.get('/api/dashboard/getUsers');
+		},
         getStock: function(){
 			return $http.get('/api/dashboard/getstock');
 		},

@@ -6,6 +6,7 @@ use App\Salemen;
 use App\Stock;
 use App\StockIssue;
 use App\Sales;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,10 +25,12 @@ class SalesController extends Controller
     {
         if($request->is('api/*')){
             $stackData = DB::table('sales')
-                ->select(['sales.*','salesmen.first_name', 'stock.product_name'])
+                ->select(['sales.*','salesmen.first_name as saleMen', 'stock.product_name', 'users.first_name', 'users.last_name'])
                 ->join('salesmen', 'sales.salesmen_id', '=', 'salesmen.id')
                 ->join('stock', 'sales.stock_id', '=', 'stock.id')
+                ->join('users', 'sales.user_id', '=', 'users.id')
                 ->where('sales.deleted_at', null)->get();
+           // dd($stackData);
             return response()->json($stackData);
         }
         return view('admin.sales.index');
@@ -37,6 +40,15 @@ class SalesController extends Controller
         $saleMen = Salemen::all();
         if($request->is('api/*')){
             return response()->json($saleMen);
+        }
+    }
+    public function getUsers(Request $request)
+    {
+       $users =  DB::table('users')
+            ->select(['users.*',])
+            ->where('user_type', 0)->get();
+        if($request->is('api/*')){
+            return response()->json($users);
         }
     }
     public function getStock(Request $request)
@@ -77,16 +89,19 @@ class SalesController extends Controller
      */
     public function store(Request $request)
     {
+        //dd($request->user_id);
         if(!empty($request->id) && empty($request->password) && !$request->wantsJson()){
             $rules = [
                 'quantity' => 'required',
                 'salesmen_id' => 'required',
+                'user_id' => 'required',
                 'stock_id' => 'required'
             ];
         } else {
             $rules = [
                 'quantity' => 'required',
                 'salesmen_id' => 'required',
+                'user_id' => 'required',
                 'stock_id' => 'required'
             ];
         }
@@ -94,6 +109,7 @@ class SalesController extends Controller
         $message = [
             'quantity.required' => 'Quantity Name field is required.',
             'salesmen_id.required' => 'Salesmen ID Quantity field is required.',
+            'user_id.required' => 'userID Quantity field is required.',
             'stock_id.required' => 'Stock ID Quantity field is required.',
         ];
         $validator = Validator::make($request->all(), $rules, $message);
@@ -105,12 +121,14 @@ class SalesController extends Controller
         } else {
             try{
                 if(!empty($request->id)){
-                    $createStockIssue = Sales::where('id', $request->id)->update([
+                    $createSales = Sales::where('id', $request->id)->update([
                         'quantity' => $request->quantity,
                         'salesmen_id' => $request->salesmen_id,
+                        'user_id' => $request->user_id,
                         'stock_id' => $request->stock_id,
                         'updated_at' => date('Y-m-d H:i:s')
                     ]);
+
                     if($request->wantsJson()){
                         return Response()->json(['success' => 'Sales information updated successfully!']);
                     }
@@ -119,10 +137,23 @@ class SalesController extends Controller
                 $createSales = Sales::create([
                     'quantity' => $request->quantity,
                     'salesmen_id' => $request->salesmen_id,
+                    'user_id' => $request->user_id,
                     'stock_id' => $request->stock_id,
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
+                $StockIssue = DB::table('stockissue')
+                    ->select('quantity')
+                    ->where('stock_id', $request->stock_id)->first();
+
+                $updateStockIssue = $StockIssue->quantity - $request->quantity;
+                // dd($updateStockIssue);
+
+                $createSales = StockIssue::where('stock_id', $request->stock_id)->update([
+                        'quantity' => $updateStockIssue,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+
                 if($request->wantsJson()){
                     return Response()->json(['success' => 'Sales created successfully!']);
                 }
