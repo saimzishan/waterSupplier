@@ -21,6 +21,7 @@ class CreateSalesmenTable extends Migration
             $table->string('phone', 50)->nullable();
             $table->string('address', 100)->nullable();
             $table->integer('area_id')->default(0);
+            $table->integer('stock_issue')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

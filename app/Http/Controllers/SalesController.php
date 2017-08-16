@@ -37,7 +37,9 @@ class SalesController extends Controller
     }
     public function getSalesMen(Request $request)
     {
-        $saleMen = Salemen::all();
+        $saleMen = DB::table('salesmen')
+            ->where('stock_issue', 1)
+            ->select(['salesmen.*'])->get();
         if($request->is('api/*')){
             return response()->json($saleMen);
         }
@@ -89,7 +91,6 @@ class SalesController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request->user_id);
         if(!empty($request->id) && empty($request->password) && !$request->wantsJson()){
             $rules = [
                 'quantity' => 'required',
@@ -121,6 +122,24 @@ class SalesController extends Controller
         } else {
             try{
                 if(!empty($request->id)){
+                    $Sale = DB::table('stockissue')
+                        ->select('solid')
+                        ->where('id', $request->id)->first();
+                    $updateStockIssue = $request->quantity;
+                    if($Sale->solid > $request->quantity )
+                    {
+                        $newSale = $Sale->solid - $request->quantity;
+                        $updateStockIssue = $Sale->solid - $newSale;
+                    }
+                    if($Sale->solid < $request->quantity )
+                    {
+                        $newSale = $request->quantity - $Sale->solid;
+                        $updateStockIssue = $Sale->solid + $newSale;
+                    }
+                    $updation = StockIssue::where('stock_id', $request->stock_id)->update([
+                        'solid' => $updateStockIssue,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
                     $createSales = Sales::where('id', $request->id)->update([
                         'quantity' => $request->quantity,
                         'salesmen_id' => $request->salesmen_id,
@@ -128,12 +147,16 @@ class SalesController extends Controller
                         'stock_id' => $request->stock_id,
                         'updated_at' => date('Y-m-d H:i:s')
                     ]);
-
                     if($request->wantsJson()){
                         return Response()->json(['success' => 'Sales information updated successfully!']);
                     }
                     return Redirect::route('sales')->with('success', 'Sales updated successfully!');
                 }
+                $updation = StockIssue::where('stock_id', $request->stock_id)->update([
+                    'solid' => $request->quantity,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
                 $createSales = Sales::create([
                     'quantity' => $request->quantity,
                     'salesmen_id' => $request->salesmen_id,
@@ -142,17 +165,6 @@ class SalesController extends Controller
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
-                $StockIssue = DB::table('stockissue')
-                    ->select('quantity')
-                    ->where('stock_id', $request->stock_id)->first();
-
-                $updateStockIssue = $StockIssue->quantity - $request->quantity;
-                // dd($updateStockIssue);
-
-                $createSales = StockIssue::where('stock_id', $request->stock_id)->update([
-                        'quantity' => $updateStockIssue,
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]);
 
                 if($request->wantsJson()){
                     return Response()->json(['success' => 'Sales created successfully!']);

@@ -82,17 +82,6 @@
                                 <form ng-submit="submitForm()" class="form-horizontal" enctype="multipart/form-data">
                                     <input type="hidden" name="id" ng-model="newData.id" value="" />
                                     <div class="form-group">
-                                        <label class="control-label col-sm-4" for="product_name">Quantity:</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" class="form-control number-only" name="quantity" ng-model="newData.quantity" placeholder="Product name" required>
-                                        </div>
-                                        <div class="col-sm-12">
-                                            <div class="alert alert-danger text-center custom-margin" ng-if="isError">
-                                                Please enter less then <strong class="text-info"> @{{ isData }}</strong> and grater then <strong class="text-info"> 0 </strong>.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
                                         <label class="control-label col-sm-4">Select SaleMen:</label>
                                         <div class="col-sm-8">
                                             <select class="form-control" name="salesmen_id" ng-model="newData.salesmen_id"
@@ -108,6 +97,17 @@
                                                     ng-options="row.id as row.last_name for row in users" required>
                                                 <option value="" selected disabled>-- Select User --</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4" for="product_name">Quantity:</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control number-only" name="quantity" ng-model="newData.quantity" placeholder="Product name" required>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="alert alert-danger text-center custom-margin" ng-if="isError">
+                                                Please enter less then <strong class="text-info"> @{{ isData }}</strong> and grater then <strong class="text-info"> 0 </strong>.
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">

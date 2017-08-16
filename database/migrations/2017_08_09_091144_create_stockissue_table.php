@@ -18,6 +18,7 @@ class CreateStockissueTable extends Migration
             $table->string('quantity', 50);
             $table->integer('salesmen_id')->unsigned();
             $table->integer('stock_id')->unsigned();
+            $table->integer('solid')->default(0);
             $table->foreign('salesmen_id')->references('id')->on('salesmen')->onDelete('cascade');
             $table->foreign('stock_id')->references('id')->on('stock')->onDelete('cascade');
             $table->softDeletes();

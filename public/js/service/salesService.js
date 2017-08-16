@@ -17,9 +17,6 @@ angular.module('salesService', [])
 		getStockbyID: function(id){
 			return $http.get('/api/dashboard/getStockbyId/'+id);
 		},
-        check_validiti: function(id){
-			return $http.get('/api/dashboard/check_validiti/'+id);
-		},
 		save: function(newData){
 			return $http({
 				method: 'POST',

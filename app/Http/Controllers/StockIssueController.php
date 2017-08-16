@@ -26,7 +26,9 @@ class StockIssueController extends Controller
             $stackData = DB::table('stockissue')
                 ->select(['stockissue.*','salesmen.first_name', 'stock.product_name'])
                 ->join('salesmen', 'stockissue.salesmen_id', '=', 'salesmen.id')
-                ->join('stock', 'stockissue.stock_id', '=', 'stock.id')->get();
+                ->join('stock', 'stockissue.stock_id', '=', 'stock.id')
+                ->where('stockissue.deleted_at', null)
+                ->get();
             return response()->json($stackData);
         }
         return view('admin.stockIssue.index');
@@ -47,7 +49,7 @@ class StockIssueController extends Controller
     }
     public function getStockbyID(Request $request, $id)
     {
-        $stockByID = Stock::where('id', $id)->select('product_quantity')->first();
+        $stockByID = Stock::where('id', $id)->select('product_quantity', 'issued')->first();
         if($request->is('api/*')){
             return response()->json($stockByID);
         }
@@ -88,6 +90,34 @@ class StockIssueController extends Controller
         } else {
             try{
                 if(!empty($request->id)){
+                    $temp = DB::table('stockissue')
+                        ->select('solid', 'quantity')
+                        ->where('id', $request->id)->first();
+                    $updateStockIssue = $request->quantity;
+                    if($temp->solid == $temp->quantity)
+                    {
+                        return Response()->json(['error' => 'Sorry you can not update this record, becoze this record is solid out' ]);
+                    }
+
+                    if($temp->quantity > $request->quantity )
+                    {
+                        $newSale = $temp->quantity - $request->quantity;
+                        $updateStockIssue = $temp->quantity - $newSale;
+                    }
+                    if($temp->quantity < $request->quantity )
+                    {
+                        $newSale = $request->quantity - $temp->quantity;
+                        $updateStockIssue = $temp->quantity + $newSale;
+                    }
+                    $updation = StockIssue::where('stock_id', $request->stock_id)->update([
+                        'quantity' => $updateStockIssue,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                    $updation = Stock::where('id', $request->stock_id)->update([
+                        'issued' => $updateStockIssue,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+
                     $createStockIssue = StockIssue::where('id', $request->id)->update([
                         'quantity' => $request->quantity,
                         'salesmen_id' => $request->salesmen_id,
@@ -99,6 +129,14 @@ class StockIssueController extends Controller
                     }
                     return Redirect::route('stockIssue')->with('success', 'StockIssue updated successfully!');
                 }
+                $updateSaleMen = Salemen::where('id', $request->salesmen_id)->update([
+                    'stock_issue' => 1,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+                $updateStock = Stock::where('id', $request->stock_id)->update([
+                    'issued' => $request->quantity,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
                 $createStockIssue = StockIssue::create([
                     'quantity' => $request->quantity,
                     'salesmen_id' => $request->salesmen_id,
@@ -114,7 +152,7 @@ class StockIssueController extends Controller
             catch(\Exception $e){
                 // dd($e->getMessage());
                 if($request->wantsJson()){
-                    return Response()->json(['error' => 'Sorry something went worng. Please try again.']);
+                    return Response()->json(['error' => 'Sorry something went worng. Please try again.' ]);
                 }
                 return Redirect::route('stockIssue')->with('error', 'Sorry something went worng. Please try again.');
             }

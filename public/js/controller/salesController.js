@@ -11,6 +11,8 @@ angular.module('salesController', [])
 	$scope.newData = {};
 	$scope.isData = false;
 	$scope.isError = false;
+	$scope.preData = false;
+	$scope.saleMen = false;
 	
 	var loadData = function(){
 		$scope.isDisabled = true;
@@ -81,10 +83,15 @@ angular.module('salesController', [])
 	$scope.editAction = function(data){
 		$scope.newData = {};
 		$scope.newData.salesmen_id = data.salesmen_id;
+		$scope.saleMen = data.salesmen_id;
+		$scope.newData.user_id = data.user_id;
 		$scope.newData.quantity = data.quantity;
+		$scope.preData = data.quantity;
 		$scope.newData.stock_id = data.stock_id;
 		$scope.newData.id = data.id;
-		$scope.isData = $scope.newData.stock_id;
+        $scope.get_StockByID(data.salesmen_id);
+        //$scope.isData = parseInt(data.quantity) + parseInt($scope.isData);
+		//alert($scope.isData);
 		$scope.openModal();
 	},
 	$scope.deleteModal = function(id){
@@ -110,6 +117,7 @@ angular.module('salesController', [])
 		$scope.alert_class = '';
 		$scope.message = '';
 		$scope.newData = {};
+        $scope.saleMen = false;
 		$scope.isData = false;
 	},
 	$scope.openModal = function(){
@@ -126,6 +134,11 @@ angular.module('salesController', [])
             .success(function(data){
                 $scope.stock = data;
                 $scope.isData = data.quantity;
+                if($scope.saleMen == id)
+				{
+                    $scope.isData = parseInt(data.issued) - parseInt(data.solid) ;
+                     $scope.isData = parseInt($scope.isData) + parseInt(data.solid);
+				}
                 $scope.newData.stock_id = data.stock_id;
             });
 	}

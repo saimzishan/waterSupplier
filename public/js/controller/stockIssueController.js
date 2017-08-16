@@ -11,8 +11,10 @@ angular.module('stockIssueController', [])
 	$scope.newData = {};
 	$scope.isData = false;
 	$scope.isError = false;
-	
-	var loadData = function(){
+    $scope.preData = false;
+    $scope.stock_id = false;
+
+    var loadData = function(){
 		$scope.isDisabled = true;
 		StockIssue.get()
 		.success(function(data){
@@ -74,7 +76,7 @@ angular.module('stockIssueController', [])
 					$scope.isResponse = false;
 					$scope.alert_class = '';
 					$scope.message = '';
-				}, 1500);
+				}, 4000);
 			}
 		});
 	},
@@ -83,7 +85,10 @@ angular.module('stockIssueController', [])
 		$scope.newData.salesmen_id = data.salesmen_id;
 		$scope.newData.quantity = data.quantity;
 		$scope.newData.stock_id = data.stock_id;
+		$scope.stock_id = data.stock_id;
 		$scope.newData.id = data.id;
+        $scope.preData = data.quantity;
+        $scope.check_validity($scope.newData.stock_id);
 		$scope.openModal();
 	},
 	$scope.deleteModal = function(id){
@@ -100,11 +105,11 @@ angular.module('stockIssueController', [])
 			$timeout(function(){
 				$scope.notification = false;
 				$scope.message = '';
-			}, 2000);
+			}, 4000);
 		});
 	},
 	$scope.closeForm = function(){
-		$("#addDriver,#confirmDelete").modal('hide');
+		$("#addStock,#confirmDelete").modal('hide');
 		$scope.isResponse = false;
 		$scope.alert_class = '';
 		$scope.message = '';
@@ -117,7 +122,12 @@ angular.module('stockIssueController', [])
     $scope.check_validity = function(id) {
         StockIssue.getStockbyID(id)
             .success(function(data){
-                $scope.isData = data.product_quantity;
+                $scope.isData = parseInt(data.product_quantity) - parseInt(data.issued);
+                if($scope.stock_id == id)
+                {
+                    $scope.isData = parseInt(data.product_quantity) - parseInt(data.issued) ;
+                    $scope.isData = parseInt($scope.isData) + parseInt($scope.preData);
+                }
             });
 	}
 	

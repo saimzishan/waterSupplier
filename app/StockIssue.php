@@ -11,6 +11,6 @@ class StockIssue extends Model
     protected $table = 'stockissue';
 
     protected $fillable = [
-        'quantity', 'salesmen_id', 'stock_id', 'created_at', 'updated_at', 'deleted_at'
+        'quantity', 'salesmen_id', 'stock_id','solid', 'created_at', 'updated_at', 'deleted_at'
     ];
 }

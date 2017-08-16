@@ -83,7 +83,7 @@ angular.module('areaController', [])
 		});
 	},
 	$scope.closeForm = function(){
-		$("#addDriver,#confirmDelete").modal('hide');
+		$("#addArea,#confirmDelete").modal('hide');
 		$scope.isResponse = false;
 		$scope.alert_class = '';
 		$scope.message = '';

@@ -84,7 +84,7 @@ angular.module('stockController', [])
 		});
 	},
 	$scope.closeForm = function(){
-		$("#addDriver,#confirmDelete").modal('hide');
+		$("#addStock,#confirmDelete").modal('hide');
 		$scope.isResponse = false;
 		$scope.alert_class = '';
 		$scope.message = '';
