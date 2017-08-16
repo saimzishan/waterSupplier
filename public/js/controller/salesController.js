@@ -50,6 +50,8 @@ angular.module('salesController', [])
             }, 2000);
         return;
 		}
+		/*console.log($scope.newData);
+		return;*/
 		$scope.isDisabled = true;
 		$scope.newData._token = CSRF_TOKEN;
         Sales.save($scope.newData)
@@ -66,7 +68,7 @@ angular.module('salesController', [])
 					$scope.alert_class = '';
 					$scope.message = '';
 					$scope.closeForm();
-				}, 2000);
+				}, 5000);
 			} else {
 				$scope.isDisabled = false;
 				$scope.isResponse = true;
@@ -134,6 +136,7 @@ angular.module('salesController', [])
             .success(function(data){
                 $scope.stock = data;
                 $scope.isData = data.quantity;
+                $scope.isData = parseInt(data.issued) - parseInt(data.solid);
                 if($scope.saleMen == id)
 				{
                     $scope.isData = parseInt(data.issued) - parseInt(data.solid) ;

@@ -129,14 +129,44 @@ class StockIssueController extends Controller
                     }
                     return Redirect::route('stockIssue')->with('success', 'StockIssue updated successfully!');
                 }
+
+                $temp = DB::table('stockissue')
+                    ->select('salesmen_id', 'stock_id', 'quantity')
+                    ->where('stockissue.stock_id', $request->stock_id)->first();
+                if($temp){
+                    if($temp->stock_id == $request->stock_id && $temp->salesmen_id == $request->salesmen_id )
+                    {
+                        $temp = $temp->quantity + $request->quantity;
+                        $updateStock = Stock::where('id', $request->stock_id)->update([
+                            'issued' => $temp,
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ]);
+                        $updation = StockIssue::where('stock_id', $request->stock_id)->update([
+                            'quantity' => $temp,
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ]);
+                        return Response()->json(['success' => 'StockIssue created successfully!']);
+                    }
+                }
                 $updateSaleMen = Salemen::where('id', $request->salesmen_id)->update([
                     'stock_issue' => 1,
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
-                $updateStock = Stock::where('id', $request->stock_id)->update([
-                    'issued' => $request->quantity,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
+                if(!$temp)
+                {
+                    $updateStock = Stock::where('id', $request->stock_id)->update([
+                        'issued' => $request->quantity,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                } else if( $temp && $temp->stock_id == $request->stock_id)
+                {
+                    $temp = $temp->quantity + $request->quantity;
+                    $updateStock = Stock::where('id', $request->stock_id)->update([
+                        'issued' => $temp,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                }
+
                 $createStockIssue = StockIssue::create([
                     'quantity' => $request->quantity,
                     'salesmen_id' => $request->salesmen_id,

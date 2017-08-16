@@ -123,6 +123,7 @@ angular.module('stockIssueController', [])
         StockIssue.getStockbyID(id)
             .success(function(data){
                 $scope.isData = parseInt(data.product_quantity) - parseInt(data.issued);
+
                 if($scope.stock_id == id)
                 {
                     $scope.isData = parseInt(data.product_quantity) - parseInt(data.issued) ;

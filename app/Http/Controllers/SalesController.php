@@ -76,9 +76,10 @@ class SalesController extends Controller
     public function getStockbyID(Request $request, $id)
     {
         $stackData = DB::table('stockissue')
-            ->where('salesmen_id', $id)
             ->select(['stockissue.*', 'stock.*'])
-            ->join('stock', 'stockissue.stock_id', '=', 'stock.id')->first();
+            ->join('stock', 'stockissue.stock_id', '=', 'stock.id')
+            ->where('stockissue.salesmen_id', $id)
+            ->first();
         if($request->is('api/*')){
             return response()->json($stackData);
         }
@@ -122,6 +123,14 @@ class SalesController extends Controller
         } else {
             try{
                 if(!empty($request->id)){
+                    $temp = DB::table('stockissue')
+                        ->select('solid', 'quantity')
+                        ->where('id', $request->id)->first();
+                    $updateStockIssue = $request->quantity;
+                    if($temp->solid == $temp->quantity)
+                    {
+                        return Response()->json(['error' => 'Sorry you can not update this record, becoze this record is solid out' ]);
+                    }
                     $Sale = DB::table('stockissue')
                         ->select('solid')
                         ->where('id', $request->id)->first();
@@ -152,11 +161,41 @@ class SalesController extends Controller
                     }
                     return Redirect::route('sales')->with('success', 'Sales updated successfully!');
                 }
-                $updation = StockIssue::where('stock_id', $request->stock_id)->update([
-                    'solid' => $request->quantity,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-
+                // insertation
+                $temp = DB::table('sales')
+                    ->select('user_id', 'salesmen_id', 'quantity')
+                    ->where('stock_id', $request->stock_id)->first();
+                 if($temp) {
+                     if( ($temp->salesmen_id == $request->salesmen_id) && ($temp->user_id == $request->user_id) )
+                     {
+                         // dd('yes');
+                         $temp = $temp->quantity + $request->quantity;
+                          dd($temp);
+                         $updation = Sales::where('stock_id', $request->stock_id && 'user_id',$request->user_id)->update([
+                             'quantity' => $temp,
+                             'updated_at' => date('Y-m-d H:i:s')
+                         ]);
+                         $updation = StockIssue::where('stock_id', $request->stock_id && 'salesmen_id',$request->salesmen_id)->update([
+                             'solid' => $temp,
+                             'updated_at' => date('Y-m-d H:i:s')
+                         ]);
+                         return Response()->json(['success' => 'Solid successfully!']);
+                     }
+                 }
+                 if(!$temp)
+                 {
+                     $updation = StockIssue::where('stock_id', $request->stock_id)->update([
+                         'solid' => $request->quantity,
+                         'updated_at' => date('Y-m-d H:i:s')
+                     ]);
+                 }else if( $temp && ( $temp->stock_id == $request->stock_id || $temp && $temp->user_id == $request->user_id ))
+                 {
+                     $temp = $temp->quantity + $request->quantity;
+                     $updateStock = StockIssue::where('stock_id', $request->stock_id)->update([
+                         'solid' => $temp,
+                         'updated_at' => date('Y-m-d H:i:s')
+                     ]);
+                 }
                 $createSales = Sales::create([
                     'quantity' => $request->quantity,
                     'salesmen_id' => $request->salesmen_id,
@@ -174,7 +213,7 @@ class SalesController extends Controller
             catch(\Exception $e){
                 // dd($e->getMessage());
                 if($request->wantsJson()){
-                    return Response()->json(['error' => 'Sorry something went worng. Please try again.']);
+                    return Response()->json(['error' => $e->getMessage()]);
                 }
                 return Redirect::route('sales')->with('error', 'Sorry something went worng. Please try again.');
             }
