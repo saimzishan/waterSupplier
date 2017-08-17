@@ -165,6 +165,10 @@ class StockIssueController extends Controller
                     'issued' => $quantity,
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
+                $updation = Salemen::where('id', $request->salesmen_id)->update([
+                    'stock_issue' => 1,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
 
                 if($request->wantsJson()){
                     return Response()->json(['success' => 'StockIssue created successfully!']);

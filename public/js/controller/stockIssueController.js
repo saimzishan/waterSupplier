@@ -13,6 +13,8 @@ angular.module('stockIssueController', [])
 	$scope.isError = false;
     $scope.preData = false;
     $scope.stock_id = false;
+    $scope.checkEdit= false;
+
 
     var loadData = function(){
 		$scope.isDisabled = true;
@@ -50,6 +52,14 @@ angular.module('stockIssueController', [])
             }, 2000);
         return;
 		}
+		if ($scope.checkEdit){
+            if( (parseInt($scope.checkEdit.salesmen_id) != parseInt($scope.newData.salesmen_id) ) || ( parseInt($scope.checkEdit.stock_id) != parseInt($scope.newData.stock_id) )  )
+            {
+                alert('You can change just Quantity field, not other');
+                return;
+            }
+		}
+
 		$scope.isDisabled = true;
 		$scope.newData._token = CSRF_TOKEN;
         StockIssue.save($scope.newData)
@@ -81,6 +91,7 @@ angular.module('stockIssueController', [])
 		});
 	},
 	$scope.editAction = function(data){
+        $scope.checkEdit = data;
 		$scope.newData = {};
 		$scope.newData.salesmen_id = data.salesmen_id;
 		$scope.newData.quantity = data.quantity;

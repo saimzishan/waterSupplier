@@ -13,6 +13,7 @@ angular.module('salesController', [])
 	$scope.isError = false;
 	$scope.preData = false;
 	$scope.saleMen = false;
+    $scope.checkEdit = false;
 	
 	var loadData = function(){
 		$scope.isDisabled = true;
@@ -50,6 +51,13 @@ angular.module('salesController', [])
             }, 2000);
         return;
 		}
+        if ($scope.checkEdit){
+            if( (parseInt($scope.checkEdit.salesmen_id) != parseInt($scope.newData.salesmen_id) ) || ( parseInt($scope.checkEdit.user_id) != parseInt($scope.newData.user_id) )  )
+            {
+                alert('You can change just Quantity field, not other');
+                return;
+            }
+        }
 		$scope.isDisabled = true;
 		$scope.newData._token = CSRF_TOKEN;
         Sales.save($scope.newData)
@@ -82,6 +90,7 @@ angular.module('salesController', [])
 	},
 	$scope.editAction = function(data){
 		$scope.newData = {};
+        $scope.checkEdit = data;
 		$scope.newData.salesmen_id = data.salesmen_id;
 		$scope.saleMen = data.salesmen_id;
 		$scope.newData.user_id = data.user_id;
@@ -137,7 +146,6 @@ angular.module('salesController', [])
                 $scope.isData = parseInt(data.quantity) - parseInt(data.solid);
                 if($scope.saleMen == id)
 				{
-					alert('yes');
                      $scope.isData = parseInt(data.issued) - parseInt(data.solid) ;
                      $scope.isData = parseInt($scope.isData) + parseInt(data.solid);
 				}
