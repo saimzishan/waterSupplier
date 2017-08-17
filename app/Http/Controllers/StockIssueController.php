@@ -90,90 +90,82 @@ class StockIssueController extends Controller
         } else {
             try{
                 if(!empty($request->id)){
-                    $temp = DB::table('stockissue')
-                        ->select('solid', 'quantity')
+                   // dd($request->id);
+                    $stockIssued = DB::table('stockissue')
+                        ->select('quantity')
+                        ->where('salesmen_id', $request->salesmen_id)
+                        ->where('stock_id', $request->stock_id)->first();
+
+                    $stockissue = DB::table('stockissue')
+                        ->select('stock_id')
                         ->where('id', $request->id)->first();
-                    $updateStockIssue = $request->quantity;
-                    if($temp->solid == $temp->quantity)
-                    {
-                        return Response()->json(['error' => 'Sorry you can not update this record, becoze this record is solid out' ]);
+                    $stock = DB::table('stock')
+                        ->select('issued')
+                        ->where('id', $stockissue->stock_id)->first();
+
+                    $newData = $stockIssued->quantity;
+                    $newIssued = $stock->issued;
+
+                    if($stockIssued->quantity > $request->quantity){
+                        $newData = $stockIssued->quantity - $request->quantity;
+                        $newIssued = $stock->issued - $newData;
+
+                        $newData = $stockIssued->quantity - $newData;
+                    }
+                    if($stockIssued->quantity < $request->quantity){
+                        $newData = $request->quantity - $stockIssued->quantity;
+                        $newIssued = $stock->issued + $newData;
+
+                        $newData = $stockIssued->quantity + $newData;
                     }
 
-                    if($temp->quantity > $request->quantity )
-                    {
-                        $newSale = $temp->quantity - $request->quantity;
-                        $updateStockIssue = $temp->quantity - $newSale;
-                    }
-                    if($temp->quantity < $request->quantity )
-                    {
-                        $newSale = $request->quantity - $temp->quantity;
-                        $updateStockIssue = $temp->quantity + $newSale;
-                    }
-                    $updation = StockIssue::where('stock_id', $request->stock_id)->update([
-                        'quantity' => $updateStockIssue,
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]);
-                    $updation = Stock::where('id', $request->stock_id)->update([
-                        'issued' => $updateStockIssue,
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]);
-
-                    $createStockIssue = StockIssue::where('id', $request->id)->update([
-                        'quantity' => $request->quantity,
+                    $updation = StockIssue::where('salesmen_id', $request->salesmen_id && 'stock_id', $request->stock_id )->update([
+                        'quantity' => $newData,
                         'salesmen_id' => $request->salesmen_id,
                         'stock_id' => $request->stock_id,
                         'updated_at' => date('Y-m-d H:i:s')
                     ]);
+                    $updation = Stock::where('id', $stockissue->stock_id)->update([
+                        'issued' => $newIssued,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+
+
                     if($request->wantsJson()){
                         return Response()->json(['success' => 'StockIssue information updated successfully!']);
                     }
                     return Redirect::route('stockIssue')->with('success', 'StockIssue updated successfully!');
                 }
 
-                $temp = DB::table('stockissue')
-                    ->select('salesmen_id', 'stock_id', 'quantity')
-                    ->where('stockissue.stock_id', $request->stock_id)->first();
-                if($temp){
-                    if($temp->stock_id == $request->stock_id && $temp->salesmen_id == $request->salesmen_id )
-                    {
-                        $temp = $temp->quantity + $request->quantity;
-                        $updateStock = Stock::where('id', $request->stock_id)->update([
-                            'issued' => $temp,
-                            'updated_at' => date('Y-m-d H:i:s')
-                        ]);
-                        $updation = StockIssue::where('stock_id', $request->stock_id)->update([
-                            'quantity' => $temp,
-                            'updated_at' => date('Y-m-d H:i:s')
-                        ]);
-                        return Response()->json(['success' => 'StockIssue created successfully!']);
-                    }
+                $stockIssued = DB::table('stockissue')
+                    ->select('solid', 'quantity', 'id')
+                    ->where('salesmen_id', $request->salesmen_id)
+                    ->where('stock_id', $request->stock_id)->first();
+                 if($stockIssued) {
+                     $quantity = $stockIssued->quantity + $request->quantity;
+                     $updation = StockIssue::where('id', $stockIssued->id)->update([
+                         'quantity' => $quantity,
+                         'updated_at' => date('Y-m-d H:i:s')
+                     ]);
+                 }
+                if(!$stockIssued) {
+                    $createStockIssue = StockIssue::create([
+                        'quantity' => $request->quantity,
+                        'salesmen_id' => $request->salesmen_id,
+                        'stock_id' => $request->stock_id,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
                 }
-                $updateSaleMen = Salemen::where('id', $request->salesmen_id)->update([
-                    'stock_issue' => 1,
+                $stockIssued = DB::table('stock')
+                    ->select('issued')
+                    ->where('id', $request->stock_id)->first();
+                $quantity = $stockIssued->issued + $request->quantity;
+                $updation = Stock::where('id', $request->stock_id)->update([
+                    'issued' => $quantity,
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
-                if(!$temp)
-                {
-                    $updateStock = Stock::where('id', $request->stock_id)->update([
-                        'issued' => $request->quantity,
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]);
-                } else if( $temp && $temp->stock_id == $request->stock_id)
-                {
-                    $temp = $temp->quantity + $request->quantity;
-                    $updateStock = Stock::where('id', $request->stock_id)->update([
-                        'issued' => $temp,
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]);
-                }
 
-                $createStockIssue = StockIssue::create([
-                    'quantity' => $request->quantity,
-                    'salesmen_id' => $request->salesmen_id,
-                    'stock_id' => $request->stock_id,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
                 if($request->wantsJson()){
                     return Response()->json(['success' => 'StockIssue created successfully!']);
                 }
@@ -182,7 +174,7 @@ class StockIssueController extends Controller
             catch(\Exception $e){
                 // dd($e->getMessage());
                 if($request->wantsJson()){
-                    return Response()->json(['error' => 'Sorry something went worng. Please try again.' ]);
+                    return Response()->json(['error' => $e->getMessage() ]);
                 }
                 return Redirect::route('stockIssue')->with('error', 'Sorry something went worng. Please try again.');
             }

@@ -88,7 +88,7 @@ angular.module('stockIssueController', [])
 		$scope.stock_id = data.stock_id;
 		$scope.newData.id = data.id;
         $scope.preData = data.quantity;
-        $scope.check_validity($scope.newData.stock_id);
+        $scope.check_validity(data.stock_id);
 		$scope.openModal();
 	},
 	$scope.deleteModal = function(id){
@@ -123,7 +123,6 @@ angular.module('stockIssueController', [])
         StockIssue.getStockbyID(id)
             .success(function(data){
                 $scope.isData = parseInt(data.product_quantity) - parseInt(data.issued);
-
                 if($scope.stock_id == id)
                 {
                     $scope.isData = parseInt(data.product_quantity) - parseInt(data.issued) ;
