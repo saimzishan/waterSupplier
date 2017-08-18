@@ -86,7 +86,13 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4" for="product_quantity">Product Quantity:</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control" name="product_quantity" ng-model="newData.product_quantity" placeholder="Product quantity" required>
+                                            <input type="text" class="form-control number-only" name="product_quantity" ng-model="newData.product_quantity" placeholder="Product quantity" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4" for="product_quantity">Price Per Item</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control number-only" name="price_per" ng-model="newData.price_per" placeholder="Product Price" required>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -145,4 +151,7 @@
     </script>
     <script src="{{ asset('/js/controller/stockController.js') }}"></script>
     <script src="{{ asset('/js/service/stockService.js') }}"></script>
+    <script>
+        $('.number-only').numeric();
+    </script>
 @endsection

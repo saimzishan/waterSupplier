@@ -63,6 +63,7 @@ angular.module('stockController', [])
 		$scope.newData = {};
 		$scope.newData.product_name = data.product_name;
 		$scope.newData.product_quantity = data.product_quantity;
+		$scope.newData.price_per = data.price_per;
 		$scope.newData.id = data.id;
 		$scope.openModal();
 	},

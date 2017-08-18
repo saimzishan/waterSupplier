@@ -36,11 +36,13 @@ class StockController extends Controller
         if(!empty($request->id) && empty($request->password) && !$request->wantsJson()){
             $rules = [
                 'product_name' => 'required',
+                'price_per' => 'required',
                 'product_quantity' => 'required'
             ];
         } else {
             $rules = [
                 'product_name' => 'required',
+                'price_per' => 'required',
                 'product_quantity' => 'required'
             ];
         }
@@ -48,6 +50,7 @@ class StockController extends Controller
         $message = [
             'product_name.required' => 'Product Name field is required.',
             'product_quantity.required' => 'Product Quantity field is required.',
+            'price_per.required' => 'Price field is required.',
         ];
         $validator = Validator::make($request->all(), $rules, $message);
         if($validator->fails()){
@@ -61,6 +64,7 @@ class StockController extends Controller
                     $createStock = Stock::where('id', $request->id)->update([
                         'product_name' => $request->product_name,
                         'product_quantity' => $request->product_quantity,
+                        'price_per' => $request->price_per,
                         'updated_at' => date('Y-m-d H:i:s')
                     ]);
                     if($request->wantsJson()){
@@ -71,6 +75,7 @@ class StockController extends Controller
                 $createStock = Stock::create([
                     'product_name' => $request->product_name,
                     'product_quantity' => $request->product_quantity,
+                    'price_per' => $request->price_per,
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);

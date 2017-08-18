@@ -11,6 +11,6 @@ class Stock extends Model
     protected $table = 'stock';
 
     protected $fillable = [
-        'product_name', 'product_quantity', 'issued', 'created_at', 'updated_at', 'deleted_at'
+        'product_name', 'product_quantity', 'issued','price_per', 'created_at', 'updated_at', 'deleted_at'
     ];
 }

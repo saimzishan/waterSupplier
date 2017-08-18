@@ -18,6 +18,7 @@ class CreateStockTable extends Migration
             $table->string('product_name', 100);
             $table->string('product_quantity', 100);
             $table->integer('issued')->default(0);
+            $table->integer('price_per')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

@@ -122,6 +122,11 @@ class SalesController extends Controller
             return Redirect::back()->withInput()->withErrors($validator);
         } else {
             try{
+                $priceTemp = DB::table('stock')
+                    ->select('price_per')
+                    ->where( 'id', $request->stock_id)
+                    ->first();
+                $prices = $priceTemp->price_per;
                 if(!empty($request->id)){
                     $temp = DB::table('stockissue')
                         ->select('solid', 'quantity', 'id')
@@ -137,8 +142,6 @@ class SalesController extends Controller
                         ->where( 'id', $request->id)
                         ->first();
                     $saleTemp = $SaleUpdate->quantity;
-                    $price = $SaleUpdate->price;
-
                     $stockIssued = $temp;
                     $updateIssue = $stockIssued->solid;
                     if($SaleUpdate->quantity > $request->quantity )
@@ -147,7 +150,7 @@ class SalesController extends Controller
                         $updateIssue = $updateIssue - $newSale;
 
                         $saleTemp = $SaleUpdate->quantity - $newSale;
-                        $price = $saleTemp*20;
+                        $price = $saleTemp*$prices;
                     }
                     if($SaleUpdate->quantity < $request->quantity )
                     {
@@ -155,7 +158,7 @@ class SalesController extends Controller
                         $updateIssue = $updateIssue + $newSale;
 
                         $saleTemp = $SaleUpdate->quantity + $newSale;
-                        $price = $saleTemp*20;
+                        $price = $saleTemp*$prices;
                     }
                     $createSales = Sales::where('id', $request->id)->update([
                         'quantity' => $saleTemp,
@@ -183,7 +186,7 @@ class SalesController extends Controller
                     ->where('salesmen_id', $request->salesmen_id)->first();
                    if($temp) {
                      $temps = $temp->quantity + $request->quantity;
-                     $price = $temps * 20;
+                     $price = $temps * $prices;
                        $updation = Sales::where('id', $temp->id)->update([
                            'quantity' => $temps,
                            'price' => $price,
@@ -206,7 +209,7 @@ class SalesController extends Controller
                        ->where('salesmen_id', $request->salesmen_id)->first();
                    if($temp1) {
                        $temps = $temp1->quantity + $request->quantity;
-                       $price = $temps * 20;
+                       $price = $temps * $prices;
                        $updation = Sales::where('id', $temp1->id)->update([
                            'quantity' => $temps,
                            'price' => $price,
@@ -229,7 +232,7 @@ class SalesController extends Controller
                        'updated_at' => date('Y-m-d H:i:s')
                    ]);*/
                }
-               $price = $request->quantity * 20;
+               $price = $request->quantity * $prices;
               $createSales = Sales::create([
                   'quantity' => $request->quantity,
                   'salesmen_id' => $request->salesmen_id,
