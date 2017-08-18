@@ -139,8 +139,7 @@ angular.module('salesController', [])
                 $scope.isData = parseInt(data.quantity) - parseInt(data.solid);
                 if($scope.saleMen == id)
 				{
-                     $scope.isData = parseInt(data.issued) - parseInt(data.solid) ;
-                   // alert($scope.isData);
+                     $scope.isData = parseInt(data.issued) - parseInt(data.solid);
                      $scope.isData = parseInt($scope.isData) + parseInt($scope.preData);
 				}
                 $scope.newData.stock_id = data.stock_id;

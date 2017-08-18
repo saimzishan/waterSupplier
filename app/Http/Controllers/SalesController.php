@@ -133,10 +133,11 @@ class SalesController extends Controller
                         return Response()->json(['error' => 'Sorry you can not update this record, becoze this record is solid out' ]);
                     }
                     $SaleUpdate = DB::table('sales')
-                        ->select('quantity')
+                        ->select('quantity', 'price')
                         ->where( 'id', $request->id)
                         ->first();
                     $saleTemp = $SaleUpdate->quantity;
+                    $price = $SaleUpdate->price;
 
                     $stockIssued = $temp;
                     $updateIssue = $stockIssued->solid;
@@ -146,6 +147,7 @@ class SalesController extends Controller
                         $updateIssue = $updateIssue - $newSale;
 
                         $saleTemp = $SaleUpdate->quantity - $newSale;
+                        $price = $saleTemp*20;
                     }
                     if($SaleUpdate->quantity < $request->quantity )
                     {
@@ -153,9 +155,11 @@ class SalesController extends Controller
                         $updateIssue = $updateIssue + $newSale;
 
                         $saleTemp = $SaleUpdate->quantity + $newSale;
+                        $price = $saleTemp*20;
                     }
                     $createSales = Sales::where('id', $request->id)->update([
                         'quantity' => $saleTemp,
+                        'price' => $price,
                         'updated_at' => date('Y-m-d H:i:s')
                     ]);
 
@@ -179,8 +183,10 @@ class SalesController extends Controller
                     ->where('salesmen_id', $request->salesmen_id)->first();
                    if($temp) {
                      $temps = $temp->quantity + $request->quantity;
+                     $price = $temps * 20;
                        $updation = Sales::where('id', $temp->id)->update([
                            'quantity' => $temps,
+                           'price' => $price,
                            'updated_at' => date('Y-m-d H:i:s')
                        ]);
                    $temp1 = DB::table('stockissue')
@@ -200,8 +206,10 @@ class SalesController extends Controller
                        ->where('salesmen_id', $request->salesmen_id)->first();
                    if($temp1) {
                        $temps = $temp1->quantity + $request->quantity;
+                       $price = $temps * 20;
                        $updation = Sales::where('id', $temp1->id)->update([
                            'quantity' => $temps,
+                           'price' => $price,
                            'updated_at' => date('Y-m-d H:i:s')
 
                        ]);
@@ -221,11 +229,13 @@ class SalesController extends Controller
                        'updated_at' => date('Y-m-d H:i:s')
                    ]);*/
                }
+               $price = $request->quantity * 20;
               $createSales = Sales::create([
                   'quantity' => $request->quantity,
                   'salesmen_id' => $request->salesmen_id,
                   'user_id' => $request->user_id,
                   'stock_id' => $request->stock_id,
+                  'price' => $price,
                   'created_at' => date('Y-m-d H:i:s'),
                   'updated_at' => date('Y-m-d H:i:s')
               ]);

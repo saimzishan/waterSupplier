@@ -18,6 +18,7 @@ class CreateSalesTable extends Migration
             $table->integer('salesmen_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->integer('stock_id')->default(0);
+            $table->integer('price')->default(0);
             $table->string('quantity', 50);
             $table->foreign('salesmen_id')->references('id')->on('salesmen')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
