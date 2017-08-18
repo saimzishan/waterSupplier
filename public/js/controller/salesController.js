@@ -99,8 +99,6 @@ angular.module('salesController', [])
 		$scope.newData.stock_id = data.stock_id;
 		$scope.newData.id = data.id;
         $scope.get_StockByID(data.salesmen_id);
-        //$scope.isData = parseInt(data.quantity) + parseInt($scope.isData);
-		//alert($scope.isData);
 		$scope.openModal();
 	},
 	$scope.deleteModal = function(id){
@@ -127,17 +125,12 @@ angular.module('salesController', [])
 		$scope.message = '';
 		$scope.newData = {};
         $scope.saleMen = false;
-		$scope.isData = false;
+        $scope.checkEdit = false;
+        $scope.isData = false;
 	},
 	$scope.openModal = function(){
 		$("#addStock").modal('show');
 	}
-    /*$scope.check_validity = function(id) {
-        Sales.check_validiti(id)
-            .success(function(data){
-                $scope.isData = data.quantity;
-            });
-	}*/
 	$scope.get_StockByID = function(id) {
         Sales.getStockbyID(id)
             .success(function(data){
@@ -147,7 +140,8 @@ angular.module('salesController', [])
                 if($scope.saleMen == id)
 				{
                      $scope.isData = parseInt(data.issued) - parseInt(data.solid) ;
-                     $scope.isData = parseInt($scope.isData) + parseInt(data.solid);
+                   // alert($scope.isData);
+                     $scope.isData = parseInt($scope.isData) + parseInt($scope.preData);
 				}
                 $scope.newData.stock_id = data.stock_id;
             });

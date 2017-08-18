@@ -125,6 +125,7 @@ angular.module('stockIssueController', [])
 		$scope.alert_class = '';
 		$scope.message = '';
 		$scope.newData = {};
+        $scope.checkEdit = false;
 		$scope.isData = false;
 	},
 	$scope.openModal = function(){
