@@ -90,6 +90,8 @@ class UsersController extends Controller
                     }
                     return Redirect::route('users')->with('success', 'User updated successfully!');
                 }
+
+                $token = $this->getToken($request->last_name);
                 $createUser = User::create([
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
@@ -98,6 +100,7 @@ class UsersController extends Controller
                     'address' => $request->address,
                     'phone' => $request->phone,
                     'password' => bcrypt($request->password),
+                    'refToken' => $token,
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
@@ -125,6 +128,13 @@ class UsersController extends Controller
         } catch(\Exception $e){
             return Response()->json(['error' => 'Sorry something went worng. Please try again.']);
         }
+    }
+
+    protected function getToken($string)
+    {
+        $token = str_random(10);
+        $token = $token.$string.'-AX';
+        return $token;
     }
 
 }
