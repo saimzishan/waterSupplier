@@ -74,7 +74,7 @@ angular.module('salesController', [])
 					$scope.alert_class = '';
 					$scope.message = '';
 					$scope.closeForm();
-				}, 5000);
+				}, 2000);
 			} else {
 				$scope.isDisabled = false;
 				$scope.isResponse = true;
@@ -84,7 +84,7 @@ angular.module('salesController', [])
 					$scope.isResponse = false;
 					$scope.alert_class = '';
 					$scope.message = '';
-				}, 2000);
+				}, 5000);
 			}
 		});
 	},

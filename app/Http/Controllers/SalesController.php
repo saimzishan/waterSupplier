@@ -124,100 +124,111 @@ class SalesController extends Controller
             try{
                 if(!empty($request->id)){
                     $temp = DB::table('stockissue')
-                        ->select('solid', 'quantity')
-                        ->where('id', $request->id)->first();
-                    $updateStockIssue = $request->quantity;
+                        ->select('solid', 'quantity', 'id')
+                        ->where( 'stock_id', $request->stock_id)
+                        ->where( 'salesmen_id', $request->salesmen_id)->first();
+
                     if($temp->solid == $temp->quantity)
                     {
                         return Response()->json(['error' => 'Sorry you can not update this record, becoze this record is solid out' ]);
                     }
-                    $Sale = DB::table('stockissue')
-                        ->select('solid')
-                        ->where('id', $request->id)->first();
-                    $updateStockIssue = $request->quantity;
-                    if($Sale->solid > $request->quantity )
+                    $SaleUpdate = DB::table('sales')
+                        ->select('quantity')
+                        ->where( 'id', $request->id)
+                        ->first();
+                    $saleTemp = $SaleUpdate->quantity;
+
+                    $stockIssued = $temp;
+                    $updateIssue = $stockIssued->solid;
+                    if($SaleUpdate->quantity > $request->quantity )
                     {
-                        $newSale = $Sale->solid - $request->quantity;
-                        $updateStockIssue = $Sale->solid - $newSale;
+                        $newSale = $SaleUpdate->quantity - $request->quantity;
+                        $updateIssue = $updateIssue - $newSale;
+
+                        $saleTemp = $SaleUpdate->quantity - $newSale;
                     }
-                    if($Sale->solid < $request->quantity )
+                    if($SaleUpdate->quantity < $request->quantity )
                     {
-                        $newSale = $request->quantity - $Sale->solid;
-                        $updateStockIssue = $Sale->solid + $newSale;
+                        $newSale = $request->quantity - $SaleUpdate->quantity;
+                        $updateIssue = $updateIssue + $newSale;
+
+                        $saleTemp = $SaleUpdate->quantity + $newSale;
                     }
-                    $updation = StockIssue::where('stock_id', $request->stock_id)->update([
-                        'solid' => $updateStockIssue,
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]);
                     $createSales = Sales::where('id', $request->id)->update([
-                        'quantity' => $request->quantity,
-                        'salesmen_id' => $request->salesmen_id,
-                        'user_id' => $request->user_id,
-                        'stock_id' => $request->stock_id,
+                        'quantity' => $saleTemp,
                         'updated_at' => date('Y-m-d H:i:s')
                     ]);
+
+                    $updation = StockIssue::where('id', $stockIssued->id)->update([
+                        'solid' => $updateIssue,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+
+
                     if($request->wantsJson()){
                         return Response()->json(['success' => 'Sales information updated successfully!']);
                     }
                     return Redirect::route('sales')->with('success', 'Sales updated successfully!');
                 }
+
+                // new insertation code start here
                 $temp = DB::table('sales')
                     ->select('user_id', 'salesmen_id', 'quantity', 'id')
                     ->where('stock_id', $request->stock_id)
                     ->where('user_id', $request->user_id)
                     ->where('salesmen_id', $request->salesmen_id)->first();
-                 if($temp) {
-                         $temps = $temp->quantity + $request->quantity;
-                         $updation = Sales::where('id', $temp->id)->update([
-                             'quantity' => $temps,
-                             'updated_at' => date('Y-m-d H:i:s')
-                         ]);
-                     $temp1 = DB::table('stockissue')
-                         ->select('solid')
-                         ->where('stock_id', $request->stock_id)
-                         ->where('salesmen_id', $request->salesmen_id)->first();
-                     $temps = $temp1->solid + $request->quantity;
-                     $updateStock = StockIssue::where('stock_id', $request->stock_id)->update([
-                         'solid' => $temps,
-                         'updated_at' => date('Y-m-d H:i:s')
-                     ]);
-                     return Response()->json(['success' => 'Solid successfully!']);
-                 } else if (!$temp){
-                     $temp1 = DB::table('sales')
-                         ->select('user_id', 'salesmen_id', 'quantity', 'id')
-                         ->where('user_id', $request->user_id)
-                         ->where('salesmen_id', $request->salesmen_id)->first();
-                     if($temp1) {
-                         $temps = $temp1->quantity + $request->quantity;
-                         $updation = Sales::where('id', $temp1->id)->update([
-                             'quantity' => $temps,
-                             'updated_at' => date('Y-m-d H:i:s')
+                   if($temp) {
+                     $temps = $temp->quantity + $request->quantity;
+                       $updation = Sales::where('id', $temp->id)->update([
+                           'quantity' => $temps,
+                           'updated_at' => date('Y-m-d H:i:s')
+                       ]);
+                   $temp1 = DB::table('stockissue')
+                       ->select('solid')
+                       ->where('stock_id', $request->stock_id)
+                       ->where('salesmen_id', $request->salesmen_id)->first();
+                   $temps = $temp1->solid + $request->quantity;
+                   $updateStock = StockIssue::where('stock_id', $request->stock_id)->update([
+                       'solid' => $temps,
+                       'updated_at' => date('Y-m-d H:i:s')
+                   ]);
+                   return Response()->json(['success' => 'Solid successfully!']);
+               } else if (!$temp){
+                   $temp1 = DB::table('sales')
+                       ->select('user_id', 'salesmen_id', 'quantity', 'id')
+                       ->where('user_id', $request->user_id)
+                       ->where('salesmen_id', $request->salesmen_id)->first();
+                   if($temp1) {
+                       $temps = $temp1->quantity + $request->quantity;
+                       $updation = Sales::where('id', $temp1->id)->update([
+                           'quantity' => $temps,
+                           'updated_at' => date('Y-m-d H:i:s')
 
-                         ]);
-                     }
-                     $temp1 = DB::table('stockissue')
-                         ->select('solid')
-                         ->where('stock_id', $request->stock_id)
-                         ->where('salesmen_id', $request->salesmen_id)->first();
-                     $temps = $temp1->solid + $request->quantity;
-                         $updateStock = StockIssue::where('stock_id', $request->stock_id)->update([
-                             'solid' => $temps,
-                             'updated_at' => date('Y-m-d H:i:s')
-                         ]);
-                 } else {
-                     $updation = StockIssue::where('stock_id', $request->stock_id)->update([
-                         'solid' => $request->quantity,
-                         'updated_at' => date('Y-m-d H:i:s')
-                     ]);
-                 }
-                $createSales = Sales::create([
-                    'quantity' => $request->quantity,
-                    'salesmen_id' => $request->salesmen_id,
-                    'user_id' => $request->user_id,
-                    'stock_id' => $request->stock_id,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
+                       ]);
+                   }
+                   $temp1 = DB::table('stockissue')
+                       ->select('solid')
+                       ->where('stock_id', $request->stock_id)
+                       ->where('salesmen_id', $request->salesmen_id)->first();
+                   $temps = $temp1->solid + $request->quantity;
+                       $updateStock = StockIssue::where('stock_id', $request->stock_id)->update([
+                           'solid' => $temps,
+                           'updated_at' => date('Y-m-d H:i:s')
+                       ]);
+               } else {
+                   /*$updation = StockIssue::where('stock_id', $request->stock_id)->update([
+                       'solid' => $request->quantity,
+                       'updated_at' => date('Y-m-d H:i:s')
+                   ]);*/
+               }
+              $createSales = Sales::create([
+                  'quantity' => $request->quantity,
+                  'salesmen_id' => $request->salesmen_id,
+                  'user_id' => $request->user_id,
+                  'stock_id' => $request->stock_id,
+                  'created_at' => date('Y-m-d H:i:s'),
+                  'updated_at' => date('Y-m-d H:i:s')
+              ]);
 
                 if($request->wantsJson()){
                     return Response()->json(['success' => 'Sales created successfully!']);
