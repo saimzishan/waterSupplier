@@ -41,7 +41,6 @@
                             </th>
                             <th>Last name</th>
                             <th>Email</th>
-                            <th>User type</th>
                             <th>Phone #</th>
                             <th>Adderss</th>
                             <th>Created at</th>
@@ -53,7 +52,6 @@
                             <td>@{{ record.first_name }}</td>
                             <td>@{{ record.last_name }}</td>
                             <td>@{{ record.email }}</td>
-                            <td>@{{ record.user_type == 0 ?  'User' :  'Administrator' }}</td>
                             <td>@{{ record.phone }}</td>
                             <td>@{{ record.address }}</td>
                             <td>@{{ record.created_at }}</td>
@@ -98,6 +96,15 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="control-label col-sm-4">Refer by :</label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" name="parent_id" ng-model="newData.parent_id"
+                                                    ng-options="row.id as row.first_name for row in Users">
+                                                <option value="" selected disabled>-- Refer by  --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="control-label col-sm-4" for="email">Email Adress:</label>
                                         <div class="col-sm-8">
                                             <input type="email" class="form-control" name="email" ng-model="newData.email" placeholder="Email">
@@ -115,13 +122,13 @@
                                             <input type="text" class="form-control" name="address" ng-model="newData.address" placeholder="Address" required>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" ng-if="!newData.id">
                                         <label class="control-label col-sm-4" for="last_name">Password:</label>
                                         <div class="col-sm-8">
                                             <input type="password" class="form-control" name="password" ng-model="newData.password" placeholder="Password" required>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" ng-if="!newData.id">
                                         <label class="control-label col-sm-4" for="password_confirmation">Confrom Password:</label>
                                         <div class="col-sm-8">
                                             <input type="password" class="form-control" name="password_confirmation" ng-model="newData.password_confirmation" placeholder="Confirm Password" required>

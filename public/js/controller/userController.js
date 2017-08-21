@@ -9,7 +9,8 @@ angular.module('userController', [])
 	$scope.notification = false;
 	$scope.isDisabled = false;
 	$scope.newData = {};
-	
+	$scope.preData = false;
+
 	var loadData = function(){
 		$scope.isDisabled = true;
 		User.get()
@@ -28,7 +29,17 @@ angular.module('userController', [])
 		$scope.openModal();
 		$scope.newData = {};
 	},
-	$scope.submitForm = function(){
+	$scope.submitForm = function() {
+		if($scope.newData.id) {
+            if ($scope.preData != $scope.newData.parent_id)
+            {
+                alert('Invelid refer user, Please change')
+                return;
+            }
+		}
+        if($scope.newData.parent_id == null) {
+            $scope.newData.parent_id = 0;
+		}
 		$scope.isDisabled = true;
 		$scope.newData._token = CSRF_TOKEN;
 		$scope.newData.user_type = user_type;
@@ -66,7 +77,11 @@ angular.module('userController', [])
 		$scope.newData.last_name = data.last_name;
 		$scope.newData.email = data.email;
 		$scope.newData.phone = data.phone;
-		$scope.newData.address = data.address;
+		$scope.newData.password = 'someData';
+		$scope.newData.password_confirmation = 'someData';
+		$scope.newData.parent_id = data.parent_id;
+        $scope.preData = data.parent_id;
+        $scope.newData.address = data.address;
 		$scope.newData.id = data.id;
 		$scope.openModal();
 	},
@@ -93,7 +108,8 @@ angular.module('userController', [])
 		$scope.alert_class = '';
 		$scope.message = '';
 		$scope.newData = {};
-	},
+        $scope.preData = false;
+    },
 	$scope.openModal = function(){
 		$("#addDriver").modal('show');
 	}

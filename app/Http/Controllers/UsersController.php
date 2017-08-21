@@ -49,7 +49,6 @@ class UsersController extends Controller
                 'password' => 'required|string|min:5|confirmed',
             ];
         }
-
         $message = [
             'first_name.required' => 'First Name field is required.',
             'phone.required' => 'Phone no field is required.',
@@ -70,6 +69,7 @@ class UsersController extends Controller
                             'first_name' => $request->first_name,
                             'last_name' => $request->last_name,
                             'address' => $request->address,
+                            'parent_id' => $request->parent_id,
                             'phone' => $request->phone,
                             'email' => $request->email,
                             'updated_at' => date('Y-m-d H:i:s')
@@ -78,10 +78,10 @@ class UsersController extends Controller
                         $createUser = User::where('id', $request->id)->update([
                             'first_name' => $request->first_name,
                             'last_name' => $request->last_name,
-                            'address' => $request->email,
-                            'phone' => $request->email,
+                            'address' => $request->address,
+                            'phone' => $request->phone,
+                            'parent_id' => $request->parent_id,
                             'email' => $request->email,
-                            'password' => bcrypt($request->password),
                             'updated_at' => date('Y-m-d H:i:s')
                         ]);
                     }
@@ -99,6 +99,7 @@ class UsersController extends Controller
                     'email' => $request->email,
                     'address' => $request->address,
                     'phone' => $request->phone,
+                    'parent_id' => $request->parent_id,
                     'password' => bcrypt($request->password),
                     'refToken' => $token,
                     'created_at' => date('Y-m-d H:i:s'),
@@ -133,7 +134,7 @@ class UsersController extends Controller
     protected function getToken($string)
     {
         $token = str_random(10);
-        $token = $token.$string.'-AX';
+        $token = strtotime(date('Y-m-d H:i:s')).$token.$string.'-AX';
         return $token;
     }
 
