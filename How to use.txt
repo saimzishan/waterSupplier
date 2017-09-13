@@ -1,0 +1,7 @@
+Steps
+1. Add company user
+2. Add company stock
+3. Add company area
+4. Add company sale men
+5. Issue stock to sale men
+6. Add sale if
